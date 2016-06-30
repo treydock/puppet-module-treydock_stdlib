@@ -39,5 +39,5 @@ RSpec.configure do |config|
 end
 
 def owens_fixtures
-  File.read(fixtures('modules', 'osc_facts/facts.d/owens-cluster-nodes.yaml'))
+  File.read(fixtures('modules', 'osc_facts/facts.d/owens_hosts.yaml'))
 end
