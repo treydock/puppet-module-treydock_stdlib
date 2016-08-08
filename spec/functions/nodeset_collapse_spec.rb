@@ -1,0 +1,54 @@
+require 'spec_helper'
+
+describe 'nodeset_collapse' do
+  it 'should exist' do
+    expect(Puppet::Parser::Functions.function('nodeset_collapse')).to eq('function_nodeset_collapse')
+  end
+
+  it 'should raise a ParseError no arguments passed' do
+    is_expected.to run.with_params().and_raise_error(Puppet::ParseError)
+  end
+
+  it 'should raise a ParseError only 2 argument passed' do
+    is_expected.to run.with_params('foo', 'bar').and_raise_error(Puppet::ParseError)
+  end
+
+  it 'should raise a ParseError if not passed array' do
+    is_expected.to run.with_params('foo').and_raise_error(Puppet::ParseError)
+  end
+
+  it 'should return value for single element' do
+    input = ['o0001']
+    is_expected.to run.with_params(input).and_return('o0001')
+  end
+
+  it 'should return value for simple elements - consecutive' do
+    input = ['o0001', 'o0002']
+    is_expected.to run.with_params(input).and_return('o000[1-2]')
+  end
+
+  it 'should return value for simple elements - non-consecutive' do
+    input = ['o0001', 'o0003']
+    is_expected.to run.with_params(input).and_return('o000[1,3]')
+  end
+
+  it 'should return complex range - 1' do
+    input = ['o0101', 'o0102', 'o0103', 'o0201']
+    is_expected.to run.with_params(input).and_return('o0[101-103,201]')
+  end
+
+  it 'should return complex range - 2' do
+    input = ['o0101', 'o0102', 'o0103', 'login01']
+    is_expected.to run.with_params(input).and_return('o010[1-3],login01')
+  end
+
+  it 'should return complex range - 3' do
+    input = ['o0101', 'o0102', 'o0103', 'login01', 'login02']
+    is_expected.to run.with_params(input).and_return('o010[1-3],login0[1-2]')
+  end
+
+  it 'should return complex range - 4' do
+    input = ['o0101', 'o0102', 'o0103', 'o0201', 'o0202', 'login01', 'login02']
+    is_expected.to run.with_params(input).and_return('o0[101-103,201-202],login0[1-2]')
+  end
+end
