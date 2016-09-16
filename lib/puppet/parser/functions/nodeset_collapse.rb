@@ -34,7 +34,7 @@ module Puppet::Parser::Functions
 
     # https://dzone.com/articles/convert-ruby-array-ranges
     def self.to_ranges(a)
-      array = a.compact.uniq.sort
+      array = a.compact.uniq.sort_by(&:to_i)
       ranges = []
       if !array.empty?
         # Initialize the left and right endpoints of the range
