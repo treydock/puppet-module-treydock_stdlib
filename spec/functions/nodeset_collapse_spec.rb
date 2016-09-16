@@ -51,4 +51,9 @@ describe 'nodeset_collapse' do
     input = ['o0101', 'o0102', 'o0103', 'o0201', 'o0202', 'login01', 'login02']
     is_expected.to run.with_params(input).and_return('o0[101-103,201-202],login0[1-2]')
   end
+
+  it 'should return range - racks' do
+    input = ["rack3", "rack4", "rack5", "rack7", "rack8", "rack9", "rack10", "rack11", "rack12", "rack13", "rack14", "rack15", "rack18", "rack19"]
+    is_expected.to run.with_params(input).and_return('rack[3-5,7-15,18-19]')
+  end
 end
