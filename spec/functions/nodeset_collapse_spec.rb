@@ -56,4 +56,9 @@ describe 'nodeset_collapse' do
     input = ["rack3", "rack4", "rack5", "rack7", "rack8", "rack9", "rack10", "rack11", "rack12", "rack13", "rack14", "rack15", "rack18", "rack19"]
     is_expected.to run.with_params(input).and_return('rack[3-5,7-15,18-19]')
   end
+
+  it 'should return datamovers' do
+    input = ['datamover02', 'datamover01']
+    is_expected.to run.with_params(input).and_return('datamover0[1-2]')
+  end
 end

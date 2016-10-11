@@ -38,7 +38,7 @@ module Puppet::Parser::Functions
       ranges = []
       if !array.empty?
         # Initialize the left and right endpoints of the range
-        left, right = a.first, nil
+        left, right = array.first, nil
         array.each do |obj|
           # If the right endpoint is set and obj is not equal to right's successor 
           # then we need to create a range.
