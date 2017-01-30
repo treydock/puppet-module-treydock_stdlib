@@ -61,4 +61,9 @@ describe 'nodeset_collapse' do
     input = ['datamover02', 'datamover01']
     is_expected.to run.with_params(input).and_return('datamover0[1-2]')
   end
+
+  it 'should handle numeric and non-numeric' do
+    input = ['sp5', 'sp5-test']
+    is_expected.to run.with_params(input).and_return('sp5,sp5-test')
+  end
 end

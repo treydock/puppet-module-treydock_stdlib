@@ -66,12 +66,22 @@ module Puppet::Parser::Functions
 
     # For each string group, get common prefix and group those systems by their values without prefix
     common = {}
+    common_all = []
     string_groups.each_pair do |str, str_nodes|
       if str_nodes.size == 1
         common[str_nodes[0]] = str_nodes
         next
       end
       c = self.common_prefix(str_nodes)
+      # Handle case where common prefix is entire node name
+      if str_nodes.include?(c)
+        common_all << c
+        str_nodes.delete(c)
+      end
+      if str_nodes.size == 1
+        common[str_nodes[0]] = str_nodes
+        next
+      end
       str_nodes.each_with_index do |node, i|
         if i == (str_nodes.size - 1)
           break
@@ -79,7 +89,12 @@ module Puppet::Parser::Functions
         if ! common.has_key?(c)
           common[c] = []
         end
-        common[c] << node.gsub(c, '')
+        common_uniq = node.gsub(c, '')
+        if common_uniq == ''
+          common[c] = [node]
+          next
+        end
+        common[c] << common_uniq
         if i == (str_nodes.size - 2)
           common[c] << str_nodes[i+1].gsub(c, '')
         end
@@ -87,7 +102,6 @@ module Puppet::Parser::Functions
     end
 
     # For each common prefix group, get ranges and format return value
-    common_all = []
     common.each_pair do |c, n|
       if n.size == 1
         common_all << n[0]
