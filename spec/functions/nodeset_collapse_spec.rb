@@ -66,4 +66,9 @@ describe 'nodeset_collapse' do
     input = ['sp5', 'sp5-test']
     is_expected.to run.with_params(input).and_return('sp5,sp5-test')
   end
+
+  it 'should handle numeric and non-numeric - 2' do
+    input = ['webdev01', 'webdev02', 'webdev02-ldap', 'webdev04']
+    is_expected.to run.with_params(input).and_return('webdev0[1-2,4],webdev02-ldap')
+  end
 end

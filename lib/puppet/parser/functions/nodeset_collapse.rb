@@ -67,12 +67,22 @@ module Puppet::Parser::Functions
     # For each string group, get common prefix and group those systems by their values without prefix
     common = {}
     common_all = []
+    exceptions = []
     string_groups.each_pair do |str, str_nodes|
       if str_nodes.size == 1
         common[str_nodes[0]] = str_nodes
         next
       end
       c = self.common_prefix(str_nodes)
+      # Handle case where common prefix and numeric are followed by non-numeric.
+      # These are exceptions
+      str_nodes.dup.each do |n|
+        numeric_n = n.gsub(c, '')
+        if numeric_n.to_i.to_s != numeric_n
+          exceptions << n
+          str_nodes.delete(n)
+        end
+      end
       # Handle case where common prefix is entire node name
       if str_nodes.include?(c)
         common_all << c
@@ -119,6 +129,6 @@ module Puppet::Parser::Functions
       common_all << "#{c}[#{n_ranges.join(',')}]"
     end
 
-    common_all.join(',')
+    (common_all + exceptions).join(',')
   end
 end
