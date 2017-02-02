@@ -78,7 +78,7 @@ module Puppet::Parser::Functions
       # These are exceptions
       str_nodes.dup.each do |n|
         numeric_n = n.gsub(c, '')
-        if not numeric_n =~ /[0-9]+/
+        if numeric_n =~ /[^0-9]/
           exceptions << n
           str_nodes.delete(n)
         end
