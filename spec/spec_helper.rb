@@ -41,3 +41,7 @@ end
 def owens_fixtures
   File.read(fixtures('modules', 'osc_facts/files/owens_hosts.yaml'))
 end
+
+def ruby_fixtures
+  File.read(fixtures('modules', 'osc_facts/files/ruby_hosts.yaml'))
+end
