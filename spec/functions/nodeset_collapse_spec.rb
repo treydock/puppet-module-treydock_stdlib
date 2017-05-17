@@ -76,4 +76,9 @@ describe 'nodeset_collapse' do
     input = ['ruby01.ten', 'ruby02.ten']
     is_expected.to run.with_params(input).and_return('ruby0[1-2].ten')
   end
+
+  it 'should handle common non-numeric suffix mixed with numeric suffix' do
+    input = ['r0501', 'r0502', 'ruby01.ten', 'ruby02.ten']
+    is_expected.to run.with_params(input).and_return('r050[1-2],ruby0[1-2].ten')
+  end
 end
