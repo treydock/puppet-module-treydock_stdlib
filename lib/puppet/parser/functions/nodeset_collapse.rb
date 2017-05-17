@@ -3,7 +3,7 @@ module Puppet::Parser::Functions
 
     EOS
   ) do |args|
-
+    debug = false
     # Validate the number of args
     if args.size != 1
       raise(Puppet::ParseError, "nodeset_collapse(): Takes exactly one " +
@@ -28,6 +28,18 @@ module Puppet::Parser::Functions
       s1, s2 = m.min, m.max
       s1.each_char.with_index do |c, i|
         return s1[0...i] if c != s2[i]
+      end
+      return s1
+    end
+
+    # Awful hack to get common suffix of an array of strings
+    # First remove common prefix and numeric characters from beginning of strings
+    def self.common_suffix(m, c)
+      return '' if m.empty?
+      m_reduced = m.map { |n| n.gsub(c, '').gsub(/^[0-9]+/, '') }
+      s1, s2 = m_reduced.min, m_reduced.max
+      s1.reverse.each_char.with_index do |c, i|
+        return s1[0...i].reverse if c != s2.reverse[i]
       end
       return s1
     end
@@ -64,55 +76,52 @@ module Puppet::Parser::Functions
       string_groups[str] << node
     end
 
+    puts "string_groups=#{string_groups}" if debug
     # For each string group, get common prefix and group those systems by their values without prefix
     common = {}
     common_all = []
     exceptions = []
     string_groups.each_pair do |str, str_nodes|
       if str_nodes.size == 1
-        common[str_nodes[0]] = str_nodes
+        common[str_nodes[0]] = {'node' => str_nodes, 'suffix' => ''}
         next
       end
       c = self.common_prefix(str_nodes)
-      # Handle case where common prefix and numeric are followed by non-numeric.
-      # These are exceptions
-      str_nodes.dup.each do |n|
-        numeric_n = n.gsub(c, '')
-        if numeric_n =~ /[^0-9]/
-          exceptions << n
-          str_nodes.delete(n)
-        end
-      end
+      s = self.common_suffix(str_nodes, c)
+      puts "c=#{c}" if debug
+      puts "s=#{s}" if debug
+
       # Handle case where common prefix is entire node name
       if str_nodes.include?(c)
         common_all << c
         str_nodes.delete(c)
       end
       if str_nodes.size == 1
-        common[str_nodes[0]] = str_nodes
+        common[str_nodes[0]] = {'node' => str_nodes, 'suffix' => s}
         next
       end
       str_nodes.each_with_index do |node, i|
-        if i == (str_nodes.size - 1)
-          break
-        end
-        if ! common.has_key?(c)
-          common[c] = []
-        end
-        common_uniq = node.gsub(c, '')
-        if common_uniq == ''
-          common[c] = [node]
+        common_uniq = node.gsub(c, '').gsub(s, '')
+        # Handle case where there is a non-numeric suffix that is not a common suffix
+        if common_uniq !~ /^[0-9]+$/
+          exceptions << node
           next
         end
-        common[c] << common_uniq
-        if i == (str_nodes.size - 2)
-          common[c] << str_nodes[i+1].gsub(c, '')
+        if ! common.has_key?(c)
+          common[c] = {'node' => [], 'suffix' => s}
         end
+        if common_uniq == ''
+          common[c]['node'] = [node]
+          next
+        end
+        common[c]['node'] << common_uniq
       end
     end
+    puts "common=#{common}" if debug
 
     # For each common prefix group, get ranges and format return value
-    common.each_pair do |c, n|
+    common.each_pair do |c, d|
+      n = d['node']
       if n.size == 1
         common_all << n[0]
         next
@@ -126,7 +135,7 @@ module Puppet::Parser::Functions
           n_ranges << "#{r.begin}-#{r.end}"
         end
       end
-      common_all << "#{c}[#{n_ranges.join(',')}]"
+      common_all << "#{c}[#{n_ranges.join(',')}]#{d['suffix']}"
     end
 
     (common_all + exceptions).join(',')
