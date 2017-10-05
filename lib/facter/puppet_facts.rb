@@ -55,6 +55,8 @@ module PuppetFacts
           Puppet.initialize_settings_for_run_mode(:agent)
         when /^(4|5)/
           Puppet.initialize_settings
+        when /^5/
+          Puppet.initialize_settings
         end
       end
     end
