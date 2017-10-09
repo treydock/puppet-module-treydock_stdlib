@@ -1,6 +1,7 @@
 # TODO: Maybe adopt what is used by stdlib puppet_vardir fact
 #
 require 'puppet'
+require 'facter/util/file_read'
 require 'openssl'
 
 module PuppetFacts
@@ -49,14 +50,13 @@ module PuppetFacts
 =end
 
     def self.init_settings
-      case Puppet.version
-      when /^3/
-        Puppet.initialize_settings_for_run_mode(:agent)
-      when /^(4|5)/
-        # Mimic parts of Puppet.do_initialize_settings_for_run_mode(:agent) which is private
-        Puppet.settings.initialize_global_settings
-        run_mode = Puppet::Util::RunMode[:agent]
-        Puppet.settings.initialize_app_defaults(Puppet::Settings.app_defaults_for_run_mode(run_mode))
+      if ! Puppet.settings.global_defaults_initialized?
+        case Puppet.version
+        when /^3/
+          Puppet.initialize_settings_for_run_mode(:agent)
+        when /^4/
+          Puppet.initialize_settings
+        end
       end
     end
 
