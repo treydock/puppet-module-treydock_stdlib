@@ -1,7 +1,6 @@
 # TODO: Maybe adopt what is used by stdlib puppet_vardir fact
 #
 require 'puppet'
-require 'facter/util/file_read'
 require 'openssl'
 
 module PuppetFacts
@@ -9,7 +8,7 @@ module PuppetFacts
     Facter.add(:puppet_environment) do
       setcode do
         PuppetFacts.init_settings
-        Puppet[:environment].to_s
+        Puppet.settings.values(nil, :agent).interpolate(:environment).to_s
       end
     end
 
@@ -54,7 +53,7 @@ module PuppetFacts
         case Puppet.version
         when /^3/
           Puppet.initialize_settings_for_run_mode(:agent)
-        when /^4/
+        when /^(4|5)/
           Puppet.initialize_settings
         end
       end
