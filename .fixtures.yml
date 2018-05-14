@@ -5,3 +5,4 @@ fixtures:
       ref: 4.11.0
   symlinks:
     osc_facts: "#{source_dir}"
+    nfsroot: "#{source_dir}/../nfsroot"

@@ -1,8 +1,12 @@
+RSpec.configure do |config|
+  config.mock_with :rspec
+end
 require 'puppetlabs_spec_helper/module_spec_helper'
 
 dir = File.expand_path(File.dirname(__FILE__))
 
 $LOAD_PATH.unshift(dir, File.join(dir, 'fixtures/modules/osc_facts/lib'))
+$LOAD_PATH.unshift(dir, File.join(dir, 'fixtures/modules/nfsroot/lib'))
 
 begin
   require 'simplecov'
@@ -16,12 +20,12 @@ rescue Exception => e
 end
 
 RSpec.configure do |config|
-  config.mock_with :mocha
+  config.mock_with :rspec
 
   config.before :each do
     # Ensure that we don't accidentally cache facts and environment
     # between test cases.
-    Facter::Util::Loader.any_instance.stubs(:load_all)
+    allow_any_instance_of(Facter::Util::Loader).to receive(:load_all)
     Facter.clear
     Facter.clear_messages
 
@@ -44,4 +48,10 @@ end
 
 def ruby_fixtures
   File.read(fixtures('modules', 'osc_facts/files/ruby_hosts.yaml'))
+end
+
+Facter.add(:cluster) do
+  setcode do
+    'owens'
+  end
 end
