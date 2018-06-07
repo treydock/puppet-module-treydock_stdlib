@@ -69,7 +69,6 @@ module Puppet::Parser::Functions
     # This separates groups of nodes that can't be ranged together
     string_groups = {}
     nodes.each do |node|
-      #parts = node.split(/\d+/)
       str = node[/([^0-9]+)/, 1]
       if ! string_groups.has_key?(str)
         string_groups[str] = []
@@ -109,8 +108,6 @@ module Puppet::Parser::Functions
           exceptions << node
           next
         end
-        # Handle case where end up just with numeric value
-        #if common_u
         if ! common.has_key?(c)
           common[c] = {'node' => [], 'suffix' => s}
         end
