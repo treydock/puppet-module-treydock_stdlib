@@ -81,4 +81,9 @@ describe 'nodeset_collapse' do
     input = ['r0501', 'r0502', 'ruby01.ten', 'ruby02.ten']
     is_expected.to run.with_params(input).and_return('r050[1-2],ruby0[1-2].ten')
   end
+
+  it 'should handle common non-numeric prefix with different suffix' do
+    input = ['ldap0','ldap1-test']
+    is_expected.to run.with_params(input).and_return('ldap0,ldap1-test')
+  end
 end
