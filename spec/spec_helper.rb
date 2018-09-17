@@ -42,6 +42,10 @@ RSpec.configure do |config|
   end
 end
 
+def pitzer_fixtures
+  File.read(fixtures('modules', 'osc_facts/files/pitzer_hosts.yaml'))
+end
+
 def owens_fixtures
   File.read(fixtures('modules', 'osc_facts/files/owens_hosts.yaml'))
 end
