@@ -2,46 +2,61 @@
   "name": "treydock-treydock_stdlib",
   "version": "0.1.0",
   "author": "treydock",
-  "summary": "",
+  "summary": "Stdlib module",
   "license": "Apache-2.0",
-  "source": "",
+  "source": "https://github.com/treydock/puppet-module-treydock_stdlib",
+  "project_page": "https://github.com/treydock/puppet-module-treydock_stdlib",
+  "issues_url": "https://github.com/treydock/puppet-module-treydock_stdlib/issues",
   "dependencies": [
-
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 4.25.0 <7.0.0"
+    }
   ],
   "operatingsystem_support": [
     {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
-        "7"
+        "6",
+        "7",
+        "8"
       ]
     },
     {
       "operatingsystem": "OracleLinux",
       "operatingsystemrelease": [
-        "7"
+        "6",
+        "7",
+        "8"
       ]
     },
     {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
+        "6",
+        "7",
         "8"
       ]
     },
     {
       "operatingsystem": "Scientific",
       "operatingsystemrelease": [
-        "7"
+        "6",
+        "7",
+        "8"
       ]
     },
     {
       "operatingsystem": "Debian",
       "operatingsystemrelease": [
+        "8",
         "9"
       ]
     },
     {
       "operatingsystem": "Ubuntu",
       "operatingsystemrelease": [
+        "16.04",
         "18.04"
       ]
     },
@@ -56,8 +71,15 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 4.10.0 < 7.0.0"
+      "version_requirement": ">= 5.0.0 < 7.0.0"
     }
+  ],
+  "tags": [
+    "hpc",
+    "crypt",
+    "password",
+    "merge",
+    "facts"
   ],
   "pdk-version": "1.13.0",
   "template-url": "https://github.com/treydock/pdk-templates.git#master",
