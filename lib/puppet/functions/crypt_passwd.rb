@@ -10,7 +10,6 @@ Puppet::Functions.create_function(:crypt_passwd) do
     if salt.nil?
       salt = call_function('fqdn_rand_string', 16)
     end
-    puts salt
     hash = password.crypt('$6$' + salt)
     hash
   end

@@ -22,7 +22,7 @@ describe 'crypt_passwd' do
     when %r{darwin}
       expected = '$6A86JNndVTdM'
     when %r{linux}
-      expected = '$6$1TxI7LtBrqFAsbIL$lxiCXG0Y4vONMY5SbLZiPM7MTmrtPxD63bPt9bUFtZ2YlQkr2t6hvvsAVlUtr7FrmWeupa69P/5UOfirrgUbn0'
+      expected = '$6$1TxI7LtBrqFAsbIL$2IBXdkJ827KhHUmkZ5T/l/J0t589jxu76BTpVUeS9qN.0ktTwrfS/6Dw8tOUBh4KKmcZYOJkYVLBrUomDFzlo/'
     end
     is_expected.to run.with_params('foo').and_return(expected)
   end
