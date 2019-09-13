@@ -19,38 +19,59 @@ describe 'puppet_facts Facts' do
 
   it 'puppet_hostcert should be defined' do
     Puppet[:hostcert] = '/dne/fqdn.pem'
-    allow(Facter.fact(:nfsroot_ro)).to receive(:value).and_return(false)
     expect(Facter.value(:puppet_hostcert)).to eq('/dne/fqdn.pem')
-  end
-
-  it 'puppet_hostcert should be nil' do
-    Puppet[:hostcert] = '/dne/fqdn.pem'
-    allow(Facter.fact(:nfsroot_ro)).to receive(:value).and_return(true)
-    expect(Facter.value(:puppet_hostcert)).to be_nil
   end
 
   it 'puppet_hostprivkey should be defined' do
     Puppet[:hostprivkey] = '/dne/key.pem'
-    allow(Facter.fact(:nfsroot_ro)).to receive(:value).and_return(false)
     expect(Facter.value(:puppet_hostprivkey)).to eq('/dne/key.pem')
-  end
-
-  it 'puppet_hostprivkey should be nil' do
-    Puppet[:hostprivkey] = '/dne/key.pem'
-    allow(Facter.fact(:nfsroot_ro)).to receive(:value).and_return(true)
-    expect(Facter.value(:puppet_hostprivkey)).to be_nil
   end
 
   it 'puppet_localcacert should be defined' do
     Puppet[:localcacert] = '/dne/ca.pem'
-    allow(Facter.fact(:nfsroot_ro)).to receive(:value).and_return(false)
     expect(Facter.value(:puppet_localcacert)).to eq('/dne/ca.pem')
   end
 
-  it 'puppet_localcacert should be nil' do
-    Puppet[:localcacert] = '/dne/ca.pem'
-    allow(Facter.fact(:nfsroot_ro)).to receive(:value).and_return(true)
-    expect(Facter.value(:puppet_localcacert)).to be_nil
+  context 'nfsroot_ro => false' do
+    before(:each) do
+      allow(Facter.fact(:nfsroot_ro)).to receive(:value).and_return(false)
+    end
+
+    it 'puppet_hostcert should be defined' do
+      Puppet[:hostcert] = '/dne/fqdn.pem'
+      expect(Facter.value(:puppet_hostcert)).to eq('/dne/fqdn.pem')
+    end
+
+    it 'puppet_hostprivkey should be defined' do
+      Puppet[:hostprivkey] = '/dne/key.pem'
+      expect(Facter.value(:puppet_hostprivkey)).to eq('/dne/key.pem')
+    end
+
+    it 'puppet_localcacert should be defined' do
+      Puppet[:localcacert] = '/dne/ca.pem'
+      expect(Facter.value(:puppet_localcacert)).to eq('/dne/ca.pem')
+    end
+  end
+
+  context 'nfsroot_ro => true' do
+    before(:each) do
+      allow(Facter.fact(:nfsroot_ro)).to receive(:value).and_return(true)
+    end
+
+    it 'puppet_hostcert should be nil' do
+      Puppet[:hostcert] = '/dne/fqdn.pem'
+      expect(Facter.value(:puppet_hostcert)).to be_nil
+    end
+
+    it 'puppet_hostprivkey should be nil' do
+      Puppet[:hostprivkey] = '/dne/key.pem'
+      expect(Facter.value(:puppet_hostprivkey)).to be_nil
+    end
+
+    it 'puppet_localcacert should be nil' do
+      Puppet[:localcacert] = '/dne/ca.pem'
+      expect(Facter.value(:puppet_localcacert)).to be_nil
+    end
   end
 
 end

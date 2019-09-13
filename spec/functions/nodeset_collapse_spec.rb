@@ -1,20 +1,18 @@
 require 'spec_helper'
 
 describe 'nodeset_collapse' do
-  it 'should exist' do
-    expect(Puppet::Parser::Functions.function('nodeset_collapse')).to eq('function_nodeset_collapse')
-  end
+  it { is_expected.not_to eq(nil) }
 
   it 'should raise a ParseError no arguments passed' do
-    is_expected.to run.with_params().and_raise_error(Puppet::ParseError)
+    is_expected.to run.with_params().and_raise_error(ArgumentError)
   end
 
   it 'should raise a ParseError only 2 argument passed' do
-    is_expected.to run.with_params('foo', 'bar').and_raise_error(Puppet::ParseError)
+    is_expected.to run.with_params('foo', 'bar').and_raise_error(ArgumentError)
   end
 
   it 'should raise a ParseError if not passed array' do
-    is_expected.to run.with_params('foo').and_raise_error(Puppet::ParseError)
+    is_expected.to run.with_params('foo').and_raise_error(ArgumentError)
   end
 
   it 'should return value for single element' do

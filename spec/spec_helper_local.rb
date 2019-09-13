@@ -1,3 +1,6 @@
+dir = File.expand_path(File.dirname(__FILE__))
+$LOAD_PATH.unshift(dir, File.join(dir, 'fixtures/modules/nfsroot/lib'))
+
 RSpec.configure do |config|
   config.before :each do
     # Ensure that we don't accidentally cache facts and environment

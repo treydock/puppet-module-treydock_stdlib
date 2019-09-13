@@ -1,10 +1,11 @@
 require 'spec_helper'
 
 describe 'deeper_merge' do
-  it { is_expected.to run.with_params().and_raise_error(Puppet::ParseError, /wrong number of arguments/i) }
-  it { is_expected.to run.with_params({ 'key' => 'value' }).and_raise_error(Puppet::ParseError, /wrong number of arguments/i) }
-  it { is_expected.to run.with_params({}, '2').and_raise_error(Puppet::ParseError, /unexpected argument type String/) }
-  it { is_expected.to run.with_params({}, 2).and_raise_error(Puppet::ParseError, /unexpected argument type Integer/) }
+  it { is_expected.not_to eq(nil) }
+  it { is_expected.to run.with_params().and_return({}) }
+  it { is_expected.to run.with_params({ 'key' => 'value' }).and_return({'key' => 'value'}) }
+  it { is_expected.to run.with_params({}, '2').and_raise_error(ArgumentError) }
+  it { is_expected.to run.with_params({}, 2).and_raise_error(ArgumentError) }
   it { is_expected.to run.with_params({}, '').and_return({}) }
   it { is_expected.to run.with_params({}, {}).and_return({}) }
   it { is_expected.to run.with_params({}, {}, {}).and_return({}) }

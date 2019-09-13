@@ -28,7 +28,7 @@ module PuppetFacts
     end
 
     Facter.add(:puppet_hostcert) do
-      confine :nfsroot_ro => [:false, 'false', false]
+      confine :nfsroot_ro => [:false, 'false', false, nil]
       setcode do
         PuppetFacts.init_settings
         Puppet[:hostcert].to_s
@@ -36,7 +36,7 @@ module PuppetFacts
     end
 
     Facter.add(:puppet_hostprivkey) do
-      confine :nfsroot_ro => [:false, 'false', false]
+      confine :nfsroot_ro => [:false, 'false', false, nil]
       setcode do
         PuppetFacts.init_settings
         Puppet[:hostprivkey].to_s
@@ -44,7 +44,7 @@ module PuppetFacts
     end
 
     Facter.add(:puppet_localcacert) do
-      confine :nfsroot_ro => [:false, 'false', false]
+      confine :nfsroot_ro => [:false, 'false', false, nil]
       setcode do
         PuppetFacts.init_settings
         Puppet[:localcacert].to_s
