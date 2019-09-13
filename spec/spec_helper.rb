@@ -1,61 +1,53 @@
-RSpec.configure do |config|
-  config.mock_with :rspec
+RSpec.configure do |c|
+  c.mock_with :rspec
 end
+
 require 'puppetlabs_spec_helper/module_spec_helper'
+require 'rspec-puppet-facts'
 
-dir = File.expand_path(File.dirname(__FILE__))
+require 'spec_helper_local' if File.file?(File.join(File.dirname(__FILE__), 'spec_helper_local.rb'))
 
-$LOAD_PATH.unshift(dir, File.join(dir, 'fixtures/modules/osc_facts/lib'))
-$LOAD_PATH.unshift(dir, File.join(dir, 'fixtures/modules/nfsroot/lib'))
+include RspecPuppetFacts
 
-begin
-  require 'simplecov'
-  require 'coveralls'
-  SimpleCov.formatter = Coveralls::SimpleCov::Formatter
-  SimpleCov.start do
-    add_filter '/spec/'
-  end
-rescue Exception => e
-  warn "Coveralls disabled"
-end
+default_facts = {
+  puppetversion: Puppet.version,
+  facterversion: Facter.version,
+}
 
-RSpec.configure do |config|
-  config.mock_with :rspec
+default_fact_files = [
+  File.expand_path(File.join(File.dirname(__FILE__), 'default_facts.yml')),
+  File.expand_path(File.join(File.dirname(__FILE__), 'default_module_facts.yml')),
+]
 
-  config.before :each do
-    # Ensure that we don't accidentally cache facts and environment
-    # between test cases.
-    allow_any_instance_of(Facter::Util::Loader).to receive(:load_all)
-    Facter.clear
-    Facter.clear_messages
+default_fact_files.each do |f|
+  next unless File.exist?(f) && File.readable?(f) && File.size?(f)
 
-    # Store any environment variables away to be restored later
-    @old_env = {}
-    ENV.each_key {|k| @old_env[k] = ENV[k]}
-  end
-
-  config.after :each do
-    # Restore environment variables after execution of each test
-    @old_env.each_pair {|k, v| ENV[k] = v}
-    to_remove = ENV.keys.reject {|key| @old_env.include? key }
-    to_remove.each {|key| ENV.delete key }
+  begin
+    default_facts.merge!(YAML.safe_load(File.read(f), [], [], true))
+  rescue => e
+    RSpec.configuration.reporter.message "WARNING: Unable to load #{f}: #{e}"
   end
 end
 
-def pitzer_fixtures
-  File.read(fixtures('modules', 'osc_facts/files/pitzer_hosts.yaml'))
-end
-
-def owens_fixtures
-  File.read(fixtures('modules', 'osc_facts/files/owens_hosts.yaml'))
-end
-
-def ruby_fixtures
-  File.read(fixtures('modules', 'osc_facts/files/ruby_hosts.yaml'))
-end
-
-Facter.add(:cluster) do
-  setcode do
-    'owens'
+RSpec.configure do |c|
+  c.default_facts = default_facts
+  c.before :each do
+    # set to strictest setting for testing
+    # by default Puppet runs at warning level
+    Puppet.settings[:strict] = :warning
+  end
+  c.filter_run_excluding(bolt: true) unless ENV['GEM_BOLT']
+  c.after(:suite) do
   end
 end
+
+# Ensures that a module is defined
+# @param module_name Name of the module
+def ensure_module_defined(module_name)
+  module_name.split('::').reduce(Object) do |last_module, next_module|
+    last_module.const_set(next_module, Module.new) unless last_module.const_defined?(next_module, false)
+    last_module.const_get(next_module, false)
+  end
+end
+
+# 'spec_overrides' from sync.yml will appear below this line
