@@ -8,7 +8,7 @@ module PuppetFacts
   def self.add_facts
     Facter.add(:puppet_environment) do
       setcode do
-        PuppetFacts.init_settings
+        # PuppetFacts.init_settings
         #       begin
         #         puts PuppetFacts.init_settings
         #       rescue Exception => e
@@ -29,7 +29,7 @@ module PuppetFacts
     Facter.add(:puppet_hostcert) do
       confine nfsroot_ro: [:false, 'false', false, nil]
       setcode do
-        PuppetFacts.init_settings
+        # PuppetFacts.init_settings
         Puppet[:hostcert].to_s
       end
     end
@@ -37,7 +37,7 @@ module PuppetFacts
     Facter.add(:puppet_hostprivkey) do
       confine nfsroot_ro: [:false, 'false', false, nil]
       setcode do
-        PuppetFacts.init_settings
+        # PuppetFacts.init_settings
         Puppet[:hostprivkey].to_s
       end
     end
@@ -45,7 +45,7 @@ module PuppetFacts
     Facter.add(:puppet_localcacert) do
       confine nfsroot_ro: [:false, 'false', false, nil]
       setcode do
-        PuppetFacts.init_settings
+        # PuppetFacts.init_settings
         Puppet[:localcacert].to_s
       end
     end
@@ -63,8 +63,6 @@ module PuppetFacts
   def self.init_settings
     return if Puppet.settings.global_defaults_initialized?
     case Puppet.version
-    when %r{^3}
-      Puppet.initialize_settings_for_run_mode(:agent)
     when %r{^(4|5)}
       Puppet.initialize_settings
     when %r{^5}

@@ -3,10 +3,10 @@ require 'facter/puppet_facts'
 
 describe 'puppet_facts Facts' do
   before :each do
-    PuppetFacts.add_facts
     Puppet[:logdir] = '/tmp'
     Puppet[:confdir] = '/tmp'
     Puppet[:vardir] = '/tmp'
+    PuppetFacts.add_facts
   end
   after :each do
     Facter.clear
