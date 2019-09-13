@@ -14,8 +14,8 @@ Puppet::Functions.create_function(:nodeset_collapse) do
     # This separates groups of nodes that can't be ranged together
     string_groups = {}
     nodes.each do |node|
-      str = node[/([^0-9]+)/, 1]
-      if ! string_groups.has_key?(str)
+      str = node[%r{([^0-9]+)}, 1]
+      unless string_groups.key?(str)
         string_groups[str] = []
       end
       string_groups[str] << node
@@ -26,13 +26,13 @@ Puppet::Functions.create_function(:nodeset_collapse) do
     common = {}
     common_all = []
     exceptions = []
-    string_groups.each_pair do |str, str_nodes|
+    string_groups.each_pair do |_str, str_nodes|
       if str_nodes.size == 1
-        common[str_nodes[0]] = {'node' => str_nodes, 'suffix' => ''}
+        common[str_nodes[0]] = { 'node' => str_nodes, 'suffix' => '' }
         next
       end
-      c = self.common_prefix(str_nodes)
-      s = self.common_suffix(str_nodes, c)
+      c = common_prefix(str_nodes)
+      s = common_suffix(str_nodes, c)
       puts "c=#{c}" if debug
       puts "s=#{s}" if debug
 
@@ -42,19 +42,19 @@ Puppet::Functions.create_function(:nodeset_collapse) do
         str_nodes.delete(c)
       end
       if str_nodes.size == 1
-        common[str_nodes[0]] = {'node' => str_nodes, 'suffix' => s}
+        common[str_nodes[0]] = { 'node' => str_nodes, 'suffix' => s }
         next
       end
-      str_nodes.each_with_index do |node, i|
+      str_nodes.each_with_index do |node, _i|
         common_uniq = node.gsub(c, '').gsub(s, '')
         puts "node=#{node} common_uniq=#{common_uniq}" if debug
         # Handle case where there is a non-numeric suffix that is not a common suffix
-        if common_uniq !~ /^[0-9]+$/
+        if common_uniq !~ %r{^[0-9]+$}
           exceptions << node
           next
         end
-        if ! common.has_key?(c)
-          common[c] = {'node' => [], 'suffix' => s}
+        unless common.key?(c)
+          common[c] = { 'node' => [], 'suffix' => s }
         end
         if common_uniq == ''
           common[c]['node'] = [node]
@@ -71,23 +71,23 @@ Puppet::Functions.create_function(:nodeset_collapse) do
     common.each_pair do |c, d|
       n = d['node']
       if n.size == 1
-        if n[0] != c
-          node = c + n[0]
-        else
-          node = n[0]
-        end
+        node = if n[0] != c
+                 c + n[0]
+               else
+                 n[0]
+               end
         puts "n.size=1 node=#{node}" if debug
         common_all << node unless common_all.include?(node)
         next
       end
-      ranges = self.to_ranges(n)
+      ranges = to_ranges(n)
       n_ranges = []
       ranges.each do |r|
-        if r.begin == r.end
-          n_ranges << r.begin.to_s
-        else
-          n_ranges << "#{r.begin}-#{r.end}"
-        end
+        n_ranges << if r.begin == r.end
+                      r.begin.to_s
+                    else
+                      "#{r.begin}-#{r.end}"
+                    end
       end
       common_all << "#{c}[#{n_ranges.join(',')}]#{d['suffix']}"
     end
@@ -99,42 +99,45 @@ Puppet::Functions.create_function(:nodeset_collapse) do
   def common_prefix(m)
     # Given a array of pathnames, returns the longest common leading component
     return '' if m.empty?
-    s1, s2 = m.min, m.max
+    s1 = m.min
+    s2 = m.max
     s1.each_char.with_index do |c, i|
       return s1[0...i] if c != s2[i]
     end
-    return s1
+    s1
   end
 
   # Awful hack to get common suffix of an array of strings
   # First remove common prefix and numeric characters from beginning of strings
   def common_suffix(m, c)
     return '' if m.empty?
-    m_reduced = m.map { |n| n.gsub(c, '').gsub(/^[0-9]+/, '') }
-    s1, s2 = m_reduced.min, m_reduced.max
-    s1.reverse.each_char.with_index do |c, i|
-      return s1[0...i].reverse if c != s2.reverse[i]
+    m_reduced = m.map { |n| n.gsub(c, '').gsub(%r{^[0-9]+}, '') }
+    s1 = m_reduced.min
+    s2 = m_reduced.max
+    s1.reverse.each_char.with_index do |cc, i|
+      return s1[0...i].reverse if cc != s2.reverse[i]
     end
-    return s1
+    s1
   end
 
   # https://dzone.com/articles/convert-ruby-array-ranges
   def to_ranges(a)
     array = a.compact.uniq.sort_by(&:to_i)
     ranges = []
-    if !array.empty?
+    unless array.empty?
       # Initialize the left and right endpoints of the range
-      left, right = array.first, nil
+      left = array.first
+      right = nil
       array.each do |obj|
-        # If the right endpoint is set and obj is not equal to right's successor 
+        # If the right endpoint is set and obj is not equal to right's successor
         # then we need to create a range.
         if right && obj != right.succ
-          ranges << Range.new(left,right)
+          ranges << Range.new(left, right)
           left = obj
         end
         right = obj
       end
-      ranges << Range.new(left,right)
+      ranges << Range.new(left, right)
     end
     ranges
   end

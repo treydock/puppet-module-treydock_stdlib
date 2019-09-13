@@ -11,7 +11,7 @@ Puppet::Functions.create_function(:crypt_passwd) do
       salt = call_function('fqdn_rand_string', 16)
     end
     puts salt
-    hash = password.crypt("$6$" + salt)
+    hash = password.crypt('$6$' + salt)
     hash
   end
 end

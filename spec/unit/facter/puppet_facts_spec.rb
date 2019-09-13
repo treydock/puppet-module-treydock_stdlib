@@ -13,7 +13,7 @@ describe 'puppet_facts Facts' do
     Facter.clear_messages
   end
 
-  it "puppet_environment should return production" do
+  it 'puppet_environment should return production' do
     expect(Facter.fact(:puppet_environment).value).to eq('production')
   end
 
@@ -73,5 +73,4 @@ describe 'puppet_facts Facts' do
       expect(Facter.value(:puppet_localcacert)).to be_nil
     end
   end
-
 end

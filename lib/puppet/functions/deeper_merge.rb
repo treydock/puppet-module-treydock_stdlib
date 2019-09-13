@@ -5,8 +5,8 @@ Puppet::Functions.create_function(:deeper_merge) do
   end
 
   def merge(*args)
-    deeper_merge = Proc.new do |hash1,hash2|
-      hash1.merge(hash2) do |key,old_value,new_value|
+    deeper_merge = proc do |hash1, hash2|
+      hash1.merge(hash2) do |_key, old_value, new_value|
         if old_value.is_a?(Hash) && new_value.is_a?(Hash)
           deeper_merge.call(old_value, new_value)
         elsif old_value.is_a?(Array) && new_value.is_a?(Array)
@@ -17,13 +17,13 @@ Puppet::Functions.create_function(:deeper_merge) do
       end
     end
 
-    result = Hash.new
+    result = {}
     args.each do |arg|
-      next if arg.is_a? String and arg.empty? # empty string is synonym for puppet's undef
+      next if arg.is_a?(String) && arg.empty? # empty string is synonym for puppet's undef
       next if arg.nil?
 
       result = deeper_merge.call(result, arg)
     end
-    return result
+    result
   end
 end
